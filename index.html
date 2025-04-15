@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Void</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Cursed & Metal Styles */
+        @keyframes shakeIntense {
+            0%, 100% { transform: translate(0, 0) rotate(0); }
+            10% { transform: translate(-5px, -3px) rotate(-1deg); }
+            20% { transform: translate(5px, 3px) rotate(1deg); }
+            30% { transform: translate(-4px, -2px) rotate(0.5deg); }
+            40% { transform: translate(4px, 2px) rotate(-0.5deg); }
+            50% { transform: translate(-6px, -4px) rotate(-1.5deg); }
+            60% { transform: translate(6px, 4px) rotate(1.5deg); }
+            70% { transform: translate(-3px, -1px) rotate(0.2deg); }
+            80% { transform: translate(3px, 1px) rotate(-0.2deg); }
+            90% { transform: translate(-5px, -3px) rotate(-1deg); }
+        }
+
+        @keyframes glitchFast {
+            0% { transform: translate(0, 0) skewX(0); opacity: 1; }
+            15% { transform: translate(3px, -2px) skewX(-5deg); opacity: 0.85; }
+            30% { transform: translate(-3px, 2px) skewX(5deg); opacity: 0.9; }
+            45% { transform: translate(2px, -1px) skewX(-3deg); opacity: 0.75; }
+            60% { transform: translate(-2px, 1px) skewX(3deg); opacity: 0.95; }
+            75% { transform: translate(4px, -3px) skewX(-6deg); opacity: 0.8; }
+            90% { transform: translate(-4px, 3px) skewX(6deg); opacity: 0.9; }
+            100% { transform: translate(0, 0) skewX(0); opacity: 1; }
+        }
+
+        @keyframes flyMetal {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.6; }
+            25% { transform: translate(150px, -80px) rotate(180deg) scale(1.2); opacity: 0.8; }
+            50% { transform: translate(-80px, 150px) rotate(-90deg) scale(0.8); opacity: 0.5; }
+            75% { transform: translate(100px, 100px) rotate(360deg) scale(1.1); opacity: 0.7; }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.6; }
+        }
+
+        @keyframes backgroundFlicker {
+            0%, 100% { background-color: #111; }
+            50% { background-color: #000; }
+        }
+
+        @keyframes noise {
+          0%, 100% { background-position: 0 0; }
+          10% { background-position: -5% -10%; }
+          20% { background-position: -15% 5%; }
+          30% { background-position: 7% -25%; }
+          40% { background-position: 20% 25%; }
+          50% { background-position: -25% 10%; }
+          60% { background-position: 15% 5%; }
+          70% { background-position: 0 15%; }
+          80% { background-position: 25% 35%; }
+          90% { background-position: -10% 10%; }
+        }
+
+        body {
+            font-family: 'Metal Mania', cursive; /* Metal font */
+            animation: backgroundFlicker 1.5s infinite steps(2, end);
+            background-color: #000; /* Start with black */
+            color: #a00; /* Dark red text */
+            overflow: hidden;
+            cursor: crosshair;
+            position: relative; /* Needed for noise overlay */
+        }
+
+        /* Noise Overlay */
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.05; /* Adjust opacity for desired effect */
+            pointer-events: none;
+            z-index: -1;
+             animation: noise 1s steps(5) infinite;
+        }
+
+
+        .shaky {
+            animation: shakeIntense 0.3s infinite cubic-bezier(.36,.07,.19,.97) both;
+            display: inline-block;
+        }
+
+        .glitchy {
+            animation: glitchFast 0.5s infinite steps(3, end);
+            display: inline-block;
+        }
+
+        .flyer {
+            position: absolute;
+            font-size: 3.5rem; /* Slightly larger */
+            animation: flyMetal 12s infinite linear;
+            z-index: -1;
+            pointer-events: none;
+            color: #666; /* Dark gray flyers */
+            text-shadow: 0 0 5px #ff0000; /* Red glow */
+        }
+
+        /* Fake loading bar - Metal Style */
+        .fake-loader-container {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            max-width: 500px;
+            height: 10px;
+            background-color: #333; /* Darker gray */
+            border: 1px solid #600; /* Dark red border */
+            border-radius: 0; /* Sharp corners */
+            overflow: hidden;
+            box-shadow: 0 0 10px #ff0000; /* Red glow */
+        }
+
+        .fake-loader-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(to right, #ff0000, #600); /* Red gradient */
+            transition: width 0.1s linear;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* Randomly appearing message - Metal Style */
+        .random-message {
+            position: fixed;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background-color: rgba(30, 0, 0, 0.9); /* Dark red translucent */
+            color: #ccc; /* Light gray text */
+            padding: 20px;
+            border: 2px solid #ff0000; /* Bright red border */
+            border-radius: 0; /* Sharp corners */
+            z-index: 100;
+            transition: transform 0.2s ease-in-out;
+            font-size: 1rem; /* Slightly larger */
+            text-align: center;
+            box-shadow: 0 0 15px #ff0000;
+            font-family: 'Courier New', Courier, monospace; /* Different font for message */
+        }
+        .random-message.show {
+             transform: translate(-50%, -50%) scale(1) rotate(1deg); /* Slight tilt */
+        }
+
+        /* Link Styles */
+        a {
+            color: #c00; /* Brighter red for links */
+            text-decoration: none;
+            border-bottom: 1px dashed #f00;
+            transition: all 0.2s ease-in-out;
+        }
+        a:hover {
+            color: #fff;
+            background-color: #f00; /* Red background on hover */
+            text-shadow: 0 0 10px #fff;
+            border-bottom: 1px solid #fff;
+        }
+
+        /* Logo Styling */
+        .logo-container {
+            margin-bottom: 2rem; /* Space below logo */
+            max-width: 80%; /* Limit logo width */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .logo-container img {
+             display: block;
+             max-width: 100%;
+             height: auto;
+             /* Optional: Add some metal effects */
+             filter: grayscale(30%) contrast(120%);
+             border: 3px solid #555;
+             box-shadow: 0 0 15px #f00;
+        }
+
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-5 relative">
+
+    <div class="flyer" style="top: 15%; left: 10%;">💀</div>
+    <div class="flyer" style="top: 75%; left: 85%; animation-delay: -4s;">🔥</div>
+    <div class="flyer" style="top: 40%; left: 50%; animation-delay: -8s;">🤘</div>
+    <div class="flyer" style="top: 60%; left: 20%; animation-delay: -2s;">⛓️</div>
+    <div class="flyer" style="top: 25%; left: 70%; animation-delay: -6s;">⚡</div>
+
+    <div class="text-center z-10">
+        <div class="logo-container">
+            <img src="DeathCoreSprudelloText.png"
+                 alt="Sprudello Logo"
+                 onerror="this.onerror=null; this.src='https://placehold.co/600x150/000000/ff0000?text=Logo+Missing&font=metalmania';"
+                 id="logoImage">
+        </div>
+
+        <h1 class="text-5xl md:text-7xl font-bold mb-8 text-red-700" style="text-shadow: 2px 2px 5px #000;">
+            <span class="shaky">W</span><span class="glitchy">e</span>lcome t<span class="shaky">o</span> <span class="glitchy">s</span>prudell<span class="shaky">o</span>.ch
+        </h1>
+        <p class="text-xl md:text-2xl mb-6 glitchy text-gray-400">
+            This is just a <span class="shaky text-red-500">parking</span> website, here are my <span class="shaky text-red-500">real</span> services:
+        </p>
+        <div class="space-y-4 text-2xl md:text-3xl">
+            <p>
+                <a href="https://cloud.sprudello.ch" target="_blank" rel="noopener noreferrer" class="shaky">
+                    cloud.sprudello.ch
+                </a>
+            </p>
+            <p>
+                <a href="https://radio.sprudello.ch" target="_blank" rel="noopener noreferrer" class="glitchy">
+                    radio.sprudello.ch
+                </a>
+            </p>
+            <p>
+                <a href="https://github.com/sprudello" target="_blank" rel="noopener noreferrer" class="shaky">
+                    GitHub
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <div class="fake-loader-container">
+        <div class="fake-loader-bar" id="fakeLoaderBar"></div>
+    </div>
+
+    <div id="randomMessage" class="random-message">
+        REALITY_KERNEL_FAULT!<br>Segment violation: CORE_DUMP_IMMORTAL<br>(Ignore this... probably)
+    </div>
+
+    <script>
+        // --- Cursed JavaScript (Mostly unchanged logic, just visuals affected by CSS) ---
+
+        // 1. Fake Loader Logic
+        const loaderBar = document.getElementById('fakeLoaderBar');
+        let loaderWidth = 0;
+        setInterval(() => {
+            const change = Math.random();
+            if (change < 0.6) { loaderWidth += Math.random() * 5; }
+            else if (change < 0.9) { loaderWidth -= Math.random() * 10; }
+            else { loaderWidth = Math.random() * 30; }
+            loaderWidth = Math.max(0, Math.min(99, loaderWidth));
+            loaderBar.style.width = `${loaderWidth}%`;
+        }, 150);
+
+        // 2. Random Sounds
+        let synth;
+        function startAudio() {
+            // Prevent starting multiple times
+            if (synth || Tone.context.state === 'running') return;
+
+            Tone.start().then(() => {
+                // Use a more distorted synth for metal feel
+                synth = new Tone.FMSynth({
+                    modulationIndex: 10,
+                    envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.5 },
+                    modulation: { type: "square" },
+                    modulationEnvelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 0.5 }
+                }).toDestination();
+                synth.volume.value = -12; // Lower volume a bit
+
+                console.log("Audio Context Started - Brace Yourself");
+
+                // Play random sounds periodically
+                setInterval(() => {
+                    // Check if synth exists before trying to use it
+                    if (!synth) return;
+
+                    if (Math.random() < 0.08) { // Slightly less frequent
+                        const freq = Math.random() * 500 + 50; // Lower, harsher frequencies
+                        const duration = Math.random() * 0.2 + 0.1;
+                        try {
+                           // Ensure synth is ready before triggering
+                           if (synth.loaded) {
+                               synth.triggerAttackRelease(freq, duration, Tone.now());
+                               // Add a quick pitch bend sometimes
+                               if (Math.random() < 0.3) {
+                                   synth.frequency.rampTo(freq * (Math.random() > 0.5 ? 1.5 : 0.5), 0.1);
+                               }
+                           }
+                        } catch (e) {
+                            console.error("Tone.js error:", e);
+                        }
+                    }
+                }, 1200); // Check slightly less often
+
+            }).catch(e => {
+                console.error("Failed to start Tone.js Audio Context:", e);
+            });
+
+            // Remove listeners after first attempt
+            document.body.removeEventListener('click', startAudio);
+            document.body.removeEventListener('keydown', startAudio);
+        }
+        // Add event listeners for the first user interaction
+        document.body.addEventListener('click', startAudio);
+        document.body.addEventListener('keydown', startAudio);
+
+
+        // 3. Randomly Show/Hide Message Box
+        const randomMessageBox = document.getElementById('randomMessage');
+        setInterval(() => {
+            if (Math.random() < 0.04) { // Less frequent
+                randomMessageBox.classList.add('show');
+                setTimeout(() => {
+                    randomMessageBox.classList.remove('show');
+                }, Math.random() * 2500 + 1500); // Show for 1.5-4 seconds
+            }
+        }, 6000); // Check every 6 seconds
+
+        // 4. Make random elements slightly draggable (same logic)
+        document.querySelectorAll('.shaky, .glitchy').forEach(el => {
+            el.style.position = 'relative';
+            el.style.cursor = 'grab';
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            el.addEventListener('mousedown', (e) => {
+                if (Math.random() < 0.25) { // Less likely to be draggable
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initialLeft = parseInt(el.style.left || '0', 10);
+                    initialTop = parseInt(el.style.top || '0', 10);
+                    el.style.cursor = 'grabbing';
+                    el.style.zIndex = '20';
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    el.style.left = `${initialLeft + dx + (Math.random() - 0.5) * 6}px`; // More jitter
+                    el.style.top = `${initialTop + dy + (Math.random() - 0.5) * 6}px`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    el.style.cursor = 'grab';
+                    el.style.zIndex = 'auto';
+                }
+            });
+        });
+
+        console.log("%cThe Metal Curse is Unleashed.", "color: red; font-size: 16px; font-weight: bold; font-family: 'Metal Mania', cursive;");
+
+    </script>
+
+</body>
+</html>
